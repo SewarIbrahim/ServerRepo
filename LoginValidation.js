@@ -20,9 +20,7 @@ app.post('/login', function(request, response){
       if(err){console.log(err);}
       else
       { if (item != null){
-               result=true; 
-               console.log("yessss"); 
-             }  
+               result=true;   }  
 
         var JsonObject = { status: result };  
         var json = JSON.stringify( JsonObject);
