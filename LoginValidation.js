@@ -59,32 +59,40 @@ app.get('/list', function(request,response){
 
 console.log('I am in GET');
 
-var obj1= {ID: 1 , Title : "note#1" , Desc : "This is note#1"};
-var obj2= {ID: 2 , Title : "note#2" , Desc : "This is note#2"};
-var obj3= {ID: 3 , Title : "note#3" , Desc : "This is note#3"};
-var obj4= {ID: 4 , Title : "note#4" , Desc : "This is note#4"};
-var obj5= {ID: 5 , Title : "note#5" , Desc : "This is note#5"};
-var obj6= {ID: 6 , Title : "note#6" , Desc : "This is note#6"};
-var obj7= {ID: 7 , Title : "note#7" , Desc : "This is note#7"};
-var obj8= {ID: 8 , Title : "note#8" , Desc : "This is note#8"};
+MongoClient.connect("mongodb://localhost:27017/mydb", function(err, db) {
+     if(err) { return console.dir(err); }
 
-var JSONarray = {"array":[obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8]};
-console.log(JSONarray);
-response.send(JSONarray);
+      var notesCollection = db.collection('notesColl');
+
+      notesCollection.find().toArray(function(err, items)
+       { 
+          var JSONarray={"array": items};
+          response.send(JSONarray);
+       });  //to retrieve names
+    });
 });
 
+/////////////////////////////////////////////////////////////////////////
 app.post('/saveNote', function(request,response){
    
     var title = request.body.Title;
     var desc = request.body.Description;
 
-    console.log(title);
-    console.log(desc);
+    MongoClient.connect("mongodb://localhost:27017/mydb", function(err, db) {
+     if(err) { return console.dir(err); }
 
-    response.send('saved');
+     var notesCollection = db.collection('notesColl');
+
+     notesCollection.insert(newNote, {w:1}, function(err, result) {  //Using the {w:1} option ensure you get the error back if the document fails to insert correctly.
+      if(err)   {console.log(err);}
+       else     {console.log('a new note is inserted');}
+    });
+  
+    var json = JSON.stringify( newNote);
+    response.send(json);});
 });
 
-
+////////////////////////////////////////////////////////////////////////
 var server = app.listen(8081, function() {
 console.log('Listening on port %d', server.address().port);
 })
